@@ -1,0 +1,17 @@
+[package]
+name = "ds_homebrew"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+libnds_sys = { git = "https://github.com/SushyDev/libnds-sys.git" }
+
+[package.metadata.nds]
+romfs_dir = "romfs"
+
+# Nintendo DS ARM9 target configuration
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
