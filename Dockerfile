@@ -3,6 +3,7 @@ FROM skylyrac/blocksds:slim-latest
 # Install essential build tools and dependencies including ARM toolchain
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
+    jq \
     curl \
     ca-certificates \
     build-essential \

@@ -15,4 +15,7 @@ shell:
 	docker build -t $(IMAGE) .
 	docker run --rm -it -v $$(pwd):/work $(IMAGE) bash
 
+autocomplete:
+	./autocomplete.sh
+
 .PHONY: build release clean shell

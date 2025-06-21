@@ -1,74 +1,36 @@
 #![no_main]
 #![no_std]
+
 extern crate alloc;
 use core::ffi::*;
 use libnds_sys::arm9_bindings::*;
-use libnds_sys::*;
+use libnds_sys::video_registers::*;
 
-fn console_init() {
-    unsafe {
-        consoleDemoInit();
-    }
-}
+mod assets;
+use assets::*;
 
-fn console_clear() {
-    unsafe {
-        consoleClear();
-    }
-}
-
-fn wait_for_vblank() {
-    unsafe {
-        swiWaitForVBlank();
-    }
-}
-
-fn print_second(second: u32) {
-    console_clear();
-
-    println!("Second: {}/{}", second, 10);
-
-    wait_for_vblank();
-}
-
-fn wait(seconds: u32) {
-    let mut frame = 0;
-    let mut second = 0;
-
-    while second < seconds {
-        if frame % 60 == 0 {
-            second += 1;
-        }
-
-        wait_for_vblank();
-
-        frame += 1;
-    }
-}
-
-#[unsafe(no_mangle)]
+#[no_mangle]
 extern "C" fn main() -> c_int {
-    return init();
-}
+    unsafe {
+        videoSetMode(MODE_5_2D as u32);
+        vramSetBankA(VRAM_A_MAIN_BG_0x06000000 as u32);
+        consoleDemoInit();
 
-fn init() -> c_int {
-    console_init();
+        let bg_id = bgInit(
+            3,
+            BgType_Bmp8 as u32,
+            BgSize_B8_256x256 as u32,
+            0,
+            0,
+        );
 
-    let mut iterations = 1;
+        let bg_gfx_ptr = bgGetGfxPtr(bg_id) as *mut u16;
 
-    loop {
-        print_second(iterations);
+        dmaCopy(DOG_LOGO_BITMAP.data.as_ptr() as *const c_void, bg_gfx_ptr as *mut c_void, 65536);
+        dmaCopy(DOG_LOGO_PALETTE.data.as_ptr() as *const c_void, BG_PALETTE as *mut c_void, 512);
 
-        if iterations >= 10 {
-            break;
+        loop {
+            swiWaitForVBlank();
         }
-
-        wait(2);
-
-        iterations += 1;
     }
-
-    wait(1);
-
-    return 0;
 }
