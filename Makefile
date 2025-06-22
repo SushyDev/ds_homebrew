@@ -1,18 +1,18 @@
 IMAGE := nds-rust-dev
 
 build:
-	docker build -t $(IMAGE) .
 	docker run --rm -v $$(pwd):/work $(IMAGE) cargo +nightly nds build
 
-release:
+prepare:
 	docker build -t $(IMAGE) .
+
+release:
 	docker run --rm -v $$(pwd):/work $(IMAGE) cargo +nightly nds build --release
 
 clean:
 	docker run --rm -v $$(pwd):/work $(IMAGE) cargo clean
 
 shell:
-	docker build -t $(IMAGE) .
 	docker run --rm -it -v $$(pwd):/work $(IMAGE) bash
 
 autocomplete:
